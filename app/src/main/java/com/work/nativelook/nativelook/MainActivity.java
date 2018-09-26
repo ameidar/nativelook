@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 pathSave = Environment.getExternalStorageDirectory().getAbsolutePath()
                         +"/"+ UUID.randomUUID().toString() + "_audio.3gp";
+                setupMediaRecorder();
                 try {
                     mediaRecorder.prepare();
                 } catch (IOException e) {
@@ -63,7 +64,70 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnStopRecord.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mediaRecorder.stop();
+                btnStopRecord.setEnabled( false );
+                btnPlay.setEnabled( true );
+                btnRecord.setEnabled( true );
+                btnStop.setEnabled( false );
+            }
+        } );
 
+        btnPlay.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnStop.setEnabled( true );
+                btnStopRecord.setEnabled( false );
+                btnRecord.setEnabled( false );
+
+                mediaPlayer = new MediaPlayer();
+                try {
+                    mediaPlayer.setDataSource( pathSave );
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                mediaPlayer.start();
+               Toast.makeText( MainActivity.this, "Playing..." , Toast.LENGTH_SHORT ).show();
+
+
+            }
+        } );
+
+        btnStop.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                btnStopRecord.setEnabled(false );
+                btnRecord.setEnabled( true );
+                btnPlay.setEnabled( true );
+                btnStop.setEnabled( false );
+
+                if (mediaPlayer!= null)
+                {
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
+                    setupMediaRecorder();
+                }
+
+
+            }
+        } );
+
+
+
+
+    }
+
+    private void setupMediaRecorder() {
+
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource( MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat( MediaRecorder.OutputFormat.THREE_GPP );
+        mediaRecorder.setAudioEncoder( MediaRecorder.OutputFormat.AMR_NB );
+        mediaRecorder.setOutputFile( pathSave );
     }
 
     /* Checks if external storage is available for read and write */
